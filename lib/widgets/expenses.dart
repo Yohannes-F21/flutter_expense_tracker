@@ -30,7 +30,40 @@ class _ExpensesState extends State<Expenses> {
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
-      builder: (ctx) => NewExpense(),
+      builder: (ctx) => NewExpense(onAddExpense: _addExpense),
+    );
+  }
+
+  void _addExpense(Expense expense) {
+    setState(() {
+      _registeredExpenses.add(expense);
+    });
+    Navigator.of(
+      context,
+    ).pop(); // Close the bottom sheet after adding the expense
+  }
+
+  void _deleteExpense(Expense expense) {
+    final expenseIndex = _registeredExpenses.indexOf(expense);
+
+    setState(() {
+      _registeredExpenses.remove(expense);
+    });
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: const Text('Expense deleted.'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              _registeredExpenses.insert(expenseIndex, expense);
+            });
+          },
+        ),
+      ),
     );
   }
 
@@ -48,7 +81,12 @@ class _ExpensesState extends State<Expenses> {
       ),
       body: Column(
         //placeholder for the chart widget
-        children: [ExpenseList(expenses: _registeredExpenses)],
+        children: [
+          ExpenseList(
+            expenses: _registeredExpenses,
+            onDeleteExpense: _deleteExpense,
+          ),
+        ],
       ),
     );
   }

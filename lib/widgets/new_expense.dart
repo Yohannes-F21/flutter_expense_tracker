@@ -2,7 +2,8 @@ import 'package:expense_tracker/models/expense.dart';
 import 'package:flutter/material.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  final void Function(Expense expense) onAddExpense;
+  const NewExpense({super.key, required this.onAddExpense});
 
   // final void Function(String title, double amount, DateTime date) onAddExpense;
 
@@ -11,7 +12,7 @@ class NewExpense extends StatefulWidget {
 }
 
 class _NewExpenseState extends State<NewExpense> {
-  final Category _selectedCategory = Category.food;
+  Category _selectedCategory = Category.food;
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
@@ -44,6 +45,15 @@ class _NewExpenseState extends State<NewExpense> {
     if (_isTitleEmpty || _isAmountEmpty || _isDateEmpty) {
       return; // Exit if validation fails
     }
+
+    widget.onAddExpense(
+      Expense(
+        title: _titleController.text,
+        amount: double.parse(_amountController.text),
+        date: _selectedDate!,
+        category: _selectedCategory,
+      ),
+    );
   }
 
   @override
@@ -118,7 +128,12 @@ class _NewExpenseState extends State<NewExpense> {
                   );
                 }).toList(),
                 onChanged: (value) {
-                  // Handle category change
+                  if (value == null) {
+                    return;
+                  }
+                  setState(() {
+                    _selectedCategory = value;
+                  });
                 },
               ),
               const Spacer(),
