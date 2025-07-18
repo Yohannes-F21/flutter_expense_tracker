@@ -1,3 +1,4 @@
+import 'package:expense_tracker/widgets/chart/chart.dart';
 import 'package:expense_tracker/widgets/expense_list/expense_list.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,16 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContent = const Center(
+      child: Text('No expenses found. Start adding some!'),
+    );
+
+    if (_registeredExpenses.isNotEmpty) {
+      mainContent = ExpenseList(
+        expenses: _registeredExpenses,
+        onDeleteExpense: _deleteExpense,
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -87,10 +98,8 @@ class _ExpensesState extends State<Expenses> {
       body: Column(
         //placeholder for the chart widget
         children: [
-          ExpenseList(
-            expenses: _registeredExpenses,
-            onDeleteExpense: _deleteExpense,
-          ),
+          Chart(expenses: _registeredExpenses),
+          Expanded(child: mainContent),
         ],
       ),
     );
